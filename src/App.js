@@ -6,14 +6,24 @@ function App() {
 
   const connectWithMetamask = useMetamask();
   const address = useAddress();
-  const { contract } = useContract("0x563cba4716F1B3eEC12c7CaC9963E178084939Ee", "edition-drop")
+  const { contract } = useContract(process.env.REACT_APP_CONTRACT_ADDRESS, "nft-drop")
 
   const claimNft = async() => {
     try {
-      const tx = await contract.claimTo(address, 0, 1); //address, tokenID, quantity
-      console.log(tx)
+      const tx = await contract.claimTo(address, 1); //address,  quantity
+      console.log(tx[0].receipt.blockHash)
+      console.log(tx[0].receipt.transactionHash);
     } catch (error) {
-      console.log("Error occured", error)
+      console.trace(error)
+    }
+  }
+
+  const balanceOf = async() => {
+    try {
+      const tx = await contract.balanceOf(address);
+      console.log(tx.toNumber());
+    }catch(error){
+      console.log(error)
     }
   }
 
@@ -23,6 +33,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         {address ? address : <button onClick={connectWithMetamask}>Connect</button>}
         {address && <button onClick={claimNft}> Claim Nft </button>}
+        {address && <button onClick={balanceOf}> See Balance </button>}
       </header>
     </div>
   );
