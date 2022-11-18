@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import {useAddress, useContract, useMetamask} from '@thirdweb-dev/react';
+import { ethers } from 'ethers';
 
 function App() {
 
@@ -18,22 +19,60 @@ function App() {
     }
   }
 
-  const balanceOf = async() => {
-    try {
-      const tx = await contract.balanceOf(address);
-      console.log(tx.toNumber());
-    }catch(error){
-      console.log(error)
-    }
-  }
+  const addNetwork = async () => {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: ethers.utils.hexlify(137),
+          chainName: "Polygon Mainnet",
+          rpcUrls: ["https://polygon-rpc.com"],
+          blockExplorerUrls: ["https://polygonscan.com"],
+          nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18
+          },
+        },
+      ],
+    });
+    window.location.reload();
+  };
+
+  // const balanceOf = async() => {
+  //   try {
+  //     const tx = await contract.balanceOf(address);
+  //     console.log(tx.toNumber());
+  //   }catch(error){
+  //     console.log(error)
+  //   }
+  // }
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+      <div className="addnetwork" style={{
+        width: "100%", 
+        display: "flex", 
+        justifyContent: "flex-end",
+        marginRight: "20vw",
+        }}>
+        <button style={{
+          borderRadius: "10px", 
+          border: "0px",
+          cursor: "pointer",
+          }}
+          onClick={addNetwork}
+          >
+        🔴 Add Polygon to Metamask!</button>
+      </div>
+      <img src={logo} className="App-logo" alt="logo" />
         {address ? address : <button onClick={connectWithMetamask}>Connect</button>}
+        <br />
+        <br />
         {address && <button onClick={claimNft}> Claim Nft </button>}
-        {address && <button onClick={balanceOf}> See Balance </button>}
+        <br />
+        {/* {address && <button onClick={balanceOf}> See Balance </button>} */}
       </header>
     </div>
   );
